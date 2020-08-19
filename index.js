@@ -11,8 +11,8 @@ const TG_BASE_URL = 'https://api.telegram.org/bot';
 
 const TG_TOKEN = process.env.TG_TOKEN;
 const CHAT_ID = parseInt(process.env.CHAT_ID);
-const CHANNEL_ID= parseInt(process.env.CHANNEL_ID);
-const TIMEOUT=1;
+const CHANNEL_ID = parseInt(process.env.CHANNEL_ID);
+const TIMEOUT=10;
 
 function log(data) {
   const ts = (new Date()).toISOString();
@@ -33,27 +33,36 @@ async function processUpdates(offset) {
   const resp = await axios.get(`${TG_BASE_URL}${TG_TOKEN}${url}`);
 
   resp.data.result.forEach(({message}) => {
-    if (message.chat.id !== CHAT_ID) {
-      console.log(`Wrong chat id: expected ${CHAT_ID} but ${message.chat.id}`);
-      return;
-    }
-
-    log({type: 'tg-message', data: message});
-
-    if ((message.text || 'not specified').startsWith('/post')) {
-      if (message.reply_to_message && message.reply_to_message.text) {
-        send('sendMessage', {chat_id: CHANNEL_ID, text: message.reply_to_message.text});
+    try {
+      if ((message.text || 'not specified').startsWith('/chatid')) {
+        send('sendMessage', {chat_id: message.chat.id, text: message.chat.id});
+        return;
       }
 
-      if (message.reply_to_message && message.reply_to_message.photo) {
-        send('sendPhoto', {chat_id: CHANNEL_ID, photo: message.reply_to_message.photo[message.reply_to_message.photo.length - 1].file_id, caption: message.reply_to_message.caption});
+      if (message.chat.id !== CHAT_ID) {
+        console.log(`Wrong chat id: expected ${CHAT_ID} but ${message.chat.id}`);
+        return;
       }
 
-      console.log(JSON.stringify(message,null,1))
-      console.log(message.text)
-      console.log(message.reply_to_message && message.reply_to_message.text)
-    } else {
-      console.log(`Unknown command ${message.text}`)
+      log({type: 'tg-message', data: message});
+
+      if ((message.text || 'not specified').startsWith('/post')) {
+        if (message.reply_to_message && message.reply_to_message.text) {
+          send('sendMessage', {chat_id: CHANNEL_ID, text: message.reply_to_message.text});
+        }
+
+        if (message.reply_to_message && message.reply_to_message.photo) {
+          send('sendPhoto', {chat_id: CHANNEL_ID, photo: message.reply_to_message.photo[message.reply_to_message.photo.length - 1].file_id, caption: message.reply_to_message.caption});
+        }
+
+        console.log(JSON.stringify(message,null,1))
+        console.log(message.text)
+        console.log(message.reply_to_message && message.reply_to_message.text)
+      } else {
+        log({type: 'unknown-command', msg: `Unknown command ${message.text}`});
+      }
+    } catch (e) {
+      log({type: 'error', msg: `Unknown command ${message.text}`});
     }
   });
 
