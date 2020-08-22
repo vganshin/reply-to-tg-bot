@@ -11,6 +11,7 @@ const TG_BASE_URL = 'https://api.telegram.org/bot';
 
 const TG_TOKEN = process.env.TG_TOKEN;
 const CHAT_ID = parseInt(process.env.CHAT_ID);
+const CHAT_NAME = process.env.CHAT_NAME;
 const CHANNEL_ID = parseInt(process.env.CHANNEL_ID);
 const TIMEOUT=10;
 
@@ -39,7 +40,7 @@ async function processUpdates(offset) {
         return;
       }
 
-      if (message.chat.id !== CHAT_ID) {
+      if (message.chat.id !== CHAT_ID && message.chat.username !== CHAT_NAME) {
         console.log(`Wrong chat id: expected ${CHAT_ID} but ${message.chat.id}`);
         return;
       }
