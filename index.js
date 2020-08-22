@@ -72,6 +72,9 @@ async function processUpdates(offset) {
 }
 
 async function main() {
+  if (!TG_TOKEN) {
+    console.log("TG_TOKEN is not defined")
+  }
   const me = await axios.get(`${TG_BASE_URL}${TG_TOKEN}/getMe`);
   console.log('==============================');
   console.log('   Running as @' + me.data.result.username);
