@@ -12,7 +12,7 @@ const TG_BASE_URL = 'https://api.telegram.org/bot';
 const TG_TOKEN = process.env.TG_TOKEN;
 const CHAT_ID = parseInt(process.env.CHAT_ID);
 const CHAT_NAME = process.env.CHAT_NAME;
-const CHANNEL_ID = parseInt(process.env.CHANNEL_ID);
+const CHANNEL_ID = process.env.CHANNEL_ID;
 const TIMEOUT=10;
 
 function log(data) {
